@@ -1,0 +1,94 @@
+{
+  "timestamp": "2026-07-02T01:24:09.444575",
+  "test_scenarios": [
+    {
+      "scenario": "REST Query Single (Baseline)",
+      "mode": "rest",
+      "total_queries": 1166,
+      "successful": 1166,
+      "failed": 0,
+      "error_rate": 0.0,
+      "response_times": {
+        "min_ms": 21.99411392211914,
+        "max_ms": 74.32222366333008,
+        "mean_ms": 25.66769949158919,
+        "median_ms": 25.006890296936035,
+        "p95_ms": 29.506444931030273,
+        "p99_ms": 42.2513484954834
+      },
+      "avg_results_per_query": 7.5,
+      "avg_freshness_score": 0.9816207140774889
+    },
+    {
+      "scenario": "REST Query Multiple",
+      "mode": "rest",
+      "total_queries": 1737,
+      "successful": 1737,
+      "failed": 0,
+      "error_rate": 0.0,
+      "response_times": {
+        "min_ms": 22.078990936279297,
+        "max_ms": 58.04038047790527,
+        "mean_ms": 25.819766226347383,
+        "median_ms": 25.357723236083984,
+        "p95_ms": 29.111385345458984,
+        "p99_ms": 38.64288330078125
+      },
+      "avg_results_per_query": 7.873344847438112,
+      "avg_freshness_score": 0.9216214148852235
+    },
+    {
+      "scenario": "REST LATEST Queries",
+      "mode": "rest",
+      "total_queries": 1123,
+      "successful": 1123,
+      "failed": 0,
+      "error_rate": 0.0,
+      "response_times": {
+        "min_ms": 21.933555603027344,
+        "max_ms": 81.39562606811523,
+        "mean_ms": 26.6471182992176,
+        "median_ms": 26.133298873901367,
+        "p95_ms": 30.436038970947266,
+        "p99_ms": 42.26517677307129
+      },
+      "avg_results_per_query": 7.1647373107747105,
+      "avg_freshness_score": 0.894503698685754
+    },
+    {
+      "scenario": "REST CONCEPTUAL Queries",
+      "mode": "rest",
+      "total_queries": 1104,
+      "successful": 1104,
+      "failed": 0,
+      "error_rate": 0.0,
+      "response_times": {
+        "min_ms": 22.43208885192871,
+        "max_ms": 63.547611236572266,
+        "mean_ms": 27.095445904178895,
+        "median_ms": 26.355743408203125,
+        "p95_ms": 32.92441368103027,
+        "p99_ms": 40.96055030822754
+      },
+      "avg_results_per_query": 8.833333333333334,
+      "avg_freshness_score": 0.992882553778785
+    }
+  ],
+  "summary": {
+    "total_scenarios": 4,
+    "total_queries_executed": 5130,
+    "total_successful": 5130,
+    "total_failed": 0,
+    "overall_error_rate": 0.0,
+    "latest_queries": {
+      "avg_response_time_ms": 26.6471182992176,
+      "avg_freshness": 0.894503698685754,
+      "total_queries": 1123
+    },
+    "conceptual_queries": {
+      "avg_response_time_ms": 27.095445904178895,
+      "avg_freshness": 0.992882553778785,
+      "total_queries": 1104
+    }
+  }
+}

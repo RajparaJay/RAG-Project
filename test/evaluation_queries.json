@@ -1,0 +1,220 @@
+{
+  "description": "Evaluation query set for Step 8 - Load Testing & Evaluation",
+  "metadata": {
+    "total_queries": 12,
+    "categories": {
+      "latest_activity": 6,
+      "conceptual": 6
+    },
+    "test_modes": ["rest", "websocket"],
+    "concurrency_levels": [1, 5, 10, 20]
+  },
+  "queries": [
+    {
+      "id": 1,
+      "query": "latest push events in the last 2 hours",
+      "type": "LATEST",
+      "description": "Recent code pushes - tests temporal ranking",
+      "expected_freshness_weight": 0.7,
+      "expected_similarity_weight": 0.3,
+      "min_expected_results": 3,
+      "test_limit": 5,
+      "test_half_life": 7200
+    },
+    {
+      "id": 2,
+      "query": "recent pull request activity",
+      "type": "LATEST",
+      "description": "Fresh PR events - tests event type filtering",
+      "expected_freshness_weight": 0.7,
+      "expected_similarity_weight": 0.3,
+      "min_expected_results": 2,
+      "test_limit": 5,
+      "test_half_life": 3600
+    },
+    {
+      "id": 3,
+      "query": "new issues created today",
+      "type": "LATEST",
+      "description": "Issue events - tests temporal decay",
+      "expected_freshness_weight": 0.8,
+      "expected_similarity_weight": 0.2,
+      "min_expected_results": 1,
+      "test_limit": 10,
+      "test_half_life": 86400
+    },
+    {
+      "id": 4,
+      "query": "urgent comments on active discussions",
+      "type": "LATEST",
+      "description": "Comment events - tests recency",
+      "expected_freshness_weight": 0.65,
+      "expected_similarity_weight": 0.35,
+      "min_expected_results": 2,
+      "test_limit": 8,
+      "test_half_life": 1800
+    },
+    {
+      "id": 5,
+      "query": "what happened in the last hour",
+      "type": "LATEST",
+      "description": "Time-based query - tests temporal matching",
+      "expected_freshness_weight": 0.75,
+      "expected_similarity_weight": 0.25,
+      "min_expected_results": 3,
+      "test_limit": 10,
+      "test_half_life": 3600
+    },
+    {
+      "id": 6,
+      "query": "hot activity right now",
+      "type": "LATEST",
+      "description": "Real-time events - tests freshness weighting",
+      "expected_freshness_weight": 0.8,
+      "expected_similarity_weight": 0.2,
+      "min_expected_results": 3,
+      "test_limit": 5,
+      "test_half_life": 600
+    },
+    {
+      "id": 7,
+      "query": "authentication and security implementation patterns",
+      "type": "CONCEPTUAL",
+      "description": "Semantic query - tests similarity matching",
+      "expected_freshness_weight": 0.3,
+      "expected_similarity_weight": 0.7,
+      "min_expected_results": 2,
+      "test_limit": 10,
+      "test_half_life": 86400
+    },
+    {
+      "id": 8,
+      "query": "machine learning and AI experiments",
+      "type": "CONCEPTUAL",
+      "description": "Topic-based semantic search",
+      "expected_freshness_weight": 0.2,
+      "expected_similarity_weight": 0.8,
+      "min_expected_results": 2,
+      "test_limit": 10,
+      "test_half_life": 86400
+    },
+    {
+      "id": 9,
+      "query": "database optimization and query performance tuning",
+      "type": "CONCEPTUAL",
+      "description": "Technical semantic search",
+      "expected_freshness_weight": 0.25,
+      "expected_similarity_weight": 0.75,
+      "min_expected_results": 1,
+      "test_limit": 8,
+      "test_half_life": 172800
+    },
+    {
+      "id": 10,
+      "query": "API design and REST endpoint development",
+      "type": "CONCEPTUAL",
+      "description": "Architecture-focused semantic query",
+      "expected_freshness_weight": 0.2,
+      "expected_similarity_weight": 0.8,
+      "min_expected_results": 2,
+      "test_limit": 10,
+      "test_half_life": 86400
+    },
+    {
+      "id": 11,
+      "query": "documentation and code comments best practices",
+      "type": "CONCEPTUAL",
+      "description": "Code quality semantic search",
+      "expected_freshness_weight": 0.15,
+      "expected_similarity_weight": 0.85,
+      "min_expected_results": 1,
+      "test_limit": 5,
+      "test_half_life": 259200
+    },
+    {
+      "id": 12,
+      "query": "testing strategies and test automation frameworks",
+      "type": "CONCEPTUAL",
+      "description": "QA-focused semantic search",
+      "expected_freshness_weight": 0.2,
+      "expected_similarity_weight": 0.8,
+      "min_expected_results": 2,
+      "test_limit": 10,
+      "test_half_life": 86400
+    }
+  ],
+  "test_scenarios": [
+    {
+      "name": "Single REST Query",
+      "description": "Baseline: Single query via REST endpoint",
+      "mode": "rest",
+      "concurrency": 1,
+      "queries": [1, 7],
+      "duration_seconds": 30,
+      "metrics_to_collect": ["response_time", "accuracy", "ranking_quality"]
+    },
+    {
+      "name": "Concurrent REST Queries",
+      "description": "Multiple concurrent REST queries (5 clients)",
+      "mode": "rest",
+      "concurrency": 5,
+      "queries": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "duration_seconds": 60,
+      "metrics_to_collect": ["response_time", "throughput", "p99_latency", "accuracy"]
+    },
+    {
+      "name": "High Concurrency REST",
+      "description": "High-load REST queries (20 clients)",
+      "mode": "rest",
+      "concurrency": 20,
+      "queries": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "duration_seconds": 120,
+      "metrics_to_collect": ["response_time", "throughput", "error_rate", "p99_latency"]
+    },
+    {
+      "name": "Single WebSocket Subscription",
+      "description": "Baseline: Single WebSocket subscription",
+      "mode": "websocket",
+      "concurrency": 1,
+      "queries": [1, 7],
+      "duration_seconds": 60,
+      "metrics_to_collect": ["connection_time", "update_latency", "messages_received"]
+    },
+    {
+      "name": "Concurrent WebSocket Subscriptions",
+      "description": "Multiple concurrent WebSocket connections (10 clients)",
+      "mode": "websocket",
+      "concurrency": 10,
+      "queries": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "duration_seconds": 120,
+      "metrics_to_collect": ["connection_time", "update_latency", "messages_received", "connection_stability"]
+    },
+    {
+      "name": "High Concurrency WebSocket",
+      "description": "High-load WebSocket subscriptions (20 clients)",
+      "mode": "websocket",
+      "concurrency": 20,
+      "queries": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+      "duration_seconds": 180,
+      "metrics_to_collect": ["connection_time", "update_latency", "messages_received", "error_rate", "connection_stability"]
+    },
+    {
+      "name": "Ranking Comparison: LATEST Queries",
+      "description": "Compare standard similarity vs freshness-aware ranking on LATEST queries",
+      "mode": "rest",
+      "concurrency": 5,
+      "queries": [1, 2, 3, 4, 5, 6],
+      "duration_seconds": 60,
+      "metrics_to_collect": ["ranking_quality", "top_result_freshness", "result_diversity"]
+    },
+    {
+      "name": "Ranking Comparison: CONCEPTUAL Queries",
+      "description": "Compare standard similarity vs freshness-aware ranking on CONCEPTUAL queries",
+      "mode": "rest",
+      "concurrency": 5,
+      "queries": [7, 8, 9, 10, 11, 12],
+      "duration_seconds": 60,
+      "metrics_to_collect": ["ranking_quality", "result_relevance", "result_diversity"]
+    }
+  ]
+}

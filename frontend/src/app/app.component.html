@@ -1,0 +1,182 @@
+﻿<div class="rag-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="logo">RAG Stream</h1>
+      <p class="subtitle">Real-time GitHub Insights</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-card glass-md">
+        <h2>Search GitHub Activity</h2>
+        
+        <form (ngSubmit)="performSearch()" class="search-form">
+          <div class="form-group">
+            <label for="query">What would you like to know?</label>
+            <div class="input-wrapper">
+              <input
+                type="text"
+                id="query"
+                [(ngModel)]="searchQuery"
+                name="query"
+                placeholder="e.g., latest React updates, recent GitHub actions..."
+                class="search-input"
+              />
+              <button type="submit" class="search-button" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Search</span>
+                <span *ngIf="isLoading" class="animate-spin">⟳</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Options -->
+          <div class="options-group">
+            <div class="option">
+              <input
+                type="radio"
+                id="mode-query"
+                [value]="'"'"'query'"'"'"
+                [(ngModel)]="searchMode"
+                name="mode"
+              />
+              <label for="mode-query">One-time Query</label>
+            </div>
+            <div class="option">
+              <input
+                type="radio"
+                id="mode-subscribe"
+                [value]="'"'"'subscribe'"'"'"
+                [(ngModel)]="searchMode"
+                name="mode"
+              />
+              <label for="mode-subscribe">Live Updates</label>
+            </div>
+          </div>
+
+          <!-- Advanced Options -->
+          <details class="advanced-options">
+            <summary>Advanced Options</summary>
+            <div class="options-content">
+              <div class="form-group">
+                <label for="limit">Results Limit:</label>
+                <input
+                  type="number"
+                  id="limit"
+                  [(ngModel)]="resultLimit"
+                  name="limit"
+                  min="1"
+                  max="20"
+                  class="input-small"
+                />
+              </div>
+              <div class="form-group">
+                <label for="half-life">Freshness Half-life (seconds):</label>
+                <input
+                  type="number"
+                  id="half-life"
+                  [(ngModel)]="halfLife"
+                  name="half_life"
+                  min="300"
+                  step="300"
+                  class="input-small"
+                />
+              </div>
+            </div>
+          </details>
+        </form>
+
+        <!-- Status Messages -->
+        <div *ngIf="errorMessage" class="alert alert-error">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="successMessage" class="alert alert-success">
+          {{ successMessage }}
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section *ngIf="hasResults" class="results-section">
+      <!-- Answer Card -->
+      <article class="answer-card glass-md animate-fade-in">
+        <header class="card-header">
+          <h2>Answer</h2>
+          <span *ngIf="isStreaming" class="streaming-indicator animate-pulse">● Live</span>
+        </header>
+        
+        <div class="answer-content">
+          <p>{{ answer }}</p>
+        </div>
+
+        <footer class="card-footer">
+          <span class="metadata">
+            Query Type: <strong>{{ queryTypeDetected }}</strong>
+          </span>
+          <span class="metadata">
+            Similarity Weight: <strong>{{ (similarityWeight * 100) | number: '"'"'1.0-0'"'"' }}%</strong>
+          </span>
+          <span class="metadata">
+            Freshness Weight: <strong>{{ (freshnessWeight * 100) | number: '"'"'1.0-0'"'"' }}%</strong>
+          </span>
+        </footer>
+      </article>
+
+      <!-- Evidence Timeline -->
+      <section class="evidence-section">
+        <h2>Supporting Evidence</h2>
+        <div class="timeline">
+          <article
+            *ngFor="let item of evidence; let i = index"
+            class="timeline-item glass animate-fade-in"
+            [style]="'"'"'--item-delay: '"'"' + (i * 50) + '"'"'ms'"'"'"
+          >
+            <div class="timeline-marker">
+              <span class="marker-dot"></span>
+              <span class="marker-line" *ngIf="i < evidence.length - 1"></span>
+            </div>
+
+            <div class="timeline-content">
+              <div class="event-header">
+                <span class="event-type">{{ item.event_type }}</span>
+                <span class="event-time">{{ formatTime(item.created_at) }}</span>
+              </div>
+
+              <div class="event-details">
+                <p><strong>Actor:</strong> {{ item.actor }}</p>
+                <p><strong>Repository:</strong> {{ item.repo }}</p>
+                <p class="event-content">{{ item.content }}</p>
+              </div>
+
+              <div class="event-scores">
+                <div class="score">
+                  <span class="label">Similarity:</span>
+                  <span class="value">{{ (item.similarity_score * 100) | number: '"'"'1.0-0'"'"' }}%</span>
+                </div>
+                <div class="score">
+                  <span class="label">Freshness:</span>
+                  <span class="value">{{ (item.freshness_score * 100) | number: '"'"'1.0-0'"'"' }}%</span>
+                </div>
+                <div class="score score-primary">
+                  <span class="label">Hybrid Score:</span>
+                  <span class="value">{{ (item.hybrid_score * 100) | number: '"'"'1.0-0'"'"' }}%</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <!-- Empty State -->
+    <section *ngIf="!hasResults && !isLoading" class="empty-state">
+      <div class="empty-content">
+        <h2>Start by searching for GitHub activity</h2>
+        <p>Type a query above to retrieve relevant GitHub events with AI-powered synthesis.</p>
+      </div>
+    </section>
+  </main>
+</div>
