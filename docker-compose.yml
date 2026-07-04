@@ -21,6 +21,32 @@ services:
     volumes:
       - redis_data:/data
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: rag_ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: rag_ollama_pull
+    restart: "no"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    command: >
+      sh -c "
+        until ollama list >/dev/null 2>&1; do
+          echo 'Waiting for Ollama...';
+          sleep 2;
+        done;
+        ollama pull ${OLLAMA_MODEL:-phi3:mini}
+      "
+    depends_on:
+      - ollama
+
   backend:
     build: ./backend
     container_name: rag_backend
@@ -37,11 +63,19 @@ services:
       - REDIS_PORT=6379
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - USE_MOCK_LLM=${USE_MOCK_LLM}
+      - LLM_PROVIDER=${LLM_PROVIDER}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - OLLAMA_NUM_GPU=${OLLAMA_NUM_GPU}
     volumes:
       - ./backend:/app
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      ollama-pull:
+        condition: service_completed_successfully
 
   worker:
     build: ./worker
@@ -77,3 +111,4 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  ollama_data:

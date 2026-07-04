@@ -39,7 +39,7 @@
               <input
                 type="radio"
                 id="mode-query"
-                [value]="'"'"'query'"'"'"
+                value="query"
                 [(ngModel)]="searchMode"
                 name="mode"
               />
@@ -49,7 +49,7 @@
               <input
                 type="radio"
                 id="mode-subscribe"
-                [value]="'"'"'subscribe'"'"'"
+                value="subscribe"
                 [(ngModel)]="searchMode"
                 name="mode"
               />
@@ -117,10 +117,10 @@
             Query Type: <strong>{{ queryTypeDetected }}</strong>
           </span>
           <span class="metadata">
-            Similarity Weight: <strong>{{ (similarityWeight * 100) | number: '"'"'1.0-0'"'"' }}%</strong>
+            Similarity Weight: <strong>{{ (similarityWeight * 100) | number: '1.0-0' }}%</strong>
           </span>
           <span class="metadata">
-            Freshness Weight: <strong>{{ (freshnessWeight * 100) | number: '"'"'1.0-0'"'"' }}%</strong>
+            Freshness Weight: <strong>{{ (freshnessWeight * 100) | number: '1.0-0' }}%</strong>
           </span>
         </footer>
       </article>
@@ -132,7 +132,7 @@
           <article
             *ngFor="let item of evidence; let i = index"
             class="timeline-item glass animate-fade-in"
-            [style]="'"'"'--item-delay: '"'"' + (i * 50) + '"'"'ms'"'"'"
+            [style.--item-delay.ms]="i * 50"
           >
             <div class="timeline-marker">
               <span class="marker-dot"></span>
@@ -154,15 +154,15 @@
               <div class="event-scores">
                 <div class="score">
                   <span class="label">Similarity:</span>
-                  <span class="value">{{ (item.similarity_score * 100) | number: '"'"'1.0-0'"'"' }}%</span>
+                  <span class="value">{{ (item.similarity_score * 100) | number: '1.0-0' }}%</span>
                 </div>
                 <div class="score">
                   <span class="label">Freshness:</span>
-                  <span class="value">{{ (item.freshness_score * 100) | number: '"'"'1.0-0'"'"' }}%</span>
+                  <span class="value">{{ (item.freshness_score * 100) | number: '1.0-0' }}%</span>
                 </div>
                 <div class="score score-primary">
                   <span class="label">Hybrid Score:</span>
-                  <span class="value">{{ (item.hybrid_score * 100) | number: '"'"'1.0-0'"'"' }}%</span>
+                  <span class="value">{{ (item.hybrid_score * 100) | number: '1.0-0' }}%</span>
                 </div>
               </div>
             </div>

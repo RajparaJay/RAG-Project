@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject, WebSocketSubject } from 'rxjs';
-import { webSocket } from 'rxjs/webSocket';
+import { Observable } from 'rxjs';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { catchError, tap } from 'rxjs/operators';
 
 interface QueryRequest {
@@ -29,7 +29,6 @@ export class RagService {
   private apiBaseUrl = 'http://localhost:8000';
   private wsBaseUrl = 'ws://localhost:8000';
   private wsSubject: WebSocketSubject<any> | null = null;
-  private messageSubject = new Subject<any>();
 
   constructor(private http: HttpClient) {}
 

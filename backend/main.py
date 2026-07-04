@@ -14,6 +14,7 @@ from sentence_transformers import SentenceTransformer
 import anthropic
 import redis
 import numpy as np
+import httpx
 from app.config import settings
 
 # Configure logging
@@ -198,11 +199,16 @@ async def re_evaluate_subscription(websocket: WebSocket, sub: dict):
     final_evidence = ranked[:limit]
     
     # 3. Synthesize answer
-    api_key = settings.ANTHROPIC_API_KEY
-    if settings.USE_MOCK_LLM or not api_key:
+    if settings.USE_MOCK_LLM:
         answer = mock_llm_synthesize(query, final_evidence)
+    elif settings.LLM_PROVIDER.lower() == "ollama":
+        answer = call_ollama(query, final_evidence)
     else:
-        answer = call_anthropic_claude(query, final_evidence, api_key)
+        api_key = settings.ANTHROPIC_API_KEY
+        if not api_key:
+            answer = mock_llm_synthesize(query, final_evidence)
+        else:
+            answer = call_anthropic_claude(query, final_evidence, api_key)
         
     # 4. Calculate evidence list diff
     new_ids = {doc["event_id"] for doc in final_evidence}
@@ -396,6 +402,42 @@ Keep the answer concise and focus on summarizing the events. If there is no rele
         logger.error(f"Anthropic API call failed: {e}")
         return f"Error contacting Anthropic Claude API: {e}. Falling back to evidence list."
 
+def call_ollama(query: str, evidence: list[dict]) -> str:
+    """Helper to synthesize response using a local Ollama model."""
+    context = ""
+    for doc in evidence:
+        context += f"Event Type: {doc['event_type']}\nActor: {doc['actor']}\nRepo: {doc['repo']}\nTime: {doc['created_at']}\nContent: {doc['content']}\n---\n"
+
+    prompt = f"""You are a real-time streaming RAG assistant. You are analyzing a live stream of GitHub activity.
+Here is the retrieved context (relevant events):
+{context}
+
+User query: {query}
+
+Answer concisely using only the context above. Mention important repositories, actors, event types, and timestamps when useful.
+"""
+
+    try:
+        response = httpx.post(
+            f"{settings.OLLAMA_BASE_URL.rstrip('/')}/api/generate",
+            json={
+                "model": settings.OLLAMA_MODEL,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "temperature": 0.0,
+                    "num_gpu": settings.OLLAMA_NUM_GPU
+                }
+            },
+            timeout=120.0,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data.get("response", "").strip() or "Ollama returned an empty response."
+    except Exception as e:
+        logger.error(f"Ollama API call failed: {e}")
+        return f"Error contacting Ollama at {settings.OLLAMA_BASE_URL}: {e}. Falling back to evidence list."
+
 @app.post("/query", response_model=QueryResponse)
 async def query_endpoint(req: QueryRequest):
     global embedding_model, db_pool
@@ -477,11 +519,16 @@ async def query_endpoint(req: QueryRequest):
     final_evidence = ranked_candidates[:req.limit]
     
     # 6. Synthesize answer
-    api_key = settings.ANTHROPIC_API_KEY
-    if settings.USE_MOCK_LLM or not api_key:
+    if settings.USE_MOCK_LLM:
         answer = mock_llm_synthesize(req.query, final_evidence)
+    elif settings.LLM_PROVIDER.lower() == "ollama":
+        answer = call_ollama(req.query, final_evidence)
     else:
-        answer = call_anthropic_claude(req.query, final_evidence, api_key)
+        api_key = settings.ANTHROPIC_API_KEY
+        if not api_key:
+            answer = mock_llm_synthesize(req.query, final_evidence)
+        else:
+            answer = call_anthropic_claude(req.query, final_evidence, api_key)
         
     return QueryResponse(
         query=req.query,
