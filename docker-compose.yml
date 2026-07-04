@@ -36,8 +36,9 @@ services:
     restart: "no"
     environment:
       - OLLAMA_HOST=http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
     command: >
-      sh -c "
+      "
         until ollama list >/dev/null 2>&1; do
           echo 'Waiting for Ollama...';
           sleep 2;
